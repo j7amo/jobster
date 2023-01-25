@@ -9,6 +9,7 @@ const express = require('express');
 
 const app = express();
 
+const path = require('path');
 const connectDB = require('./db/connect');
 const authenticateUser = require('./middleware/authentication');
 // routers
@@ -18,6 +19,15 @@ const jobsRouter = require('./routes/jobs');
 const notFoundMiddleware = require('./middleware/not-found');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 
+// serve the frontend
+app.use(
+  express.static(
+    path.resolve(
+      __dirname,
+      '../../node-express-mongo-jobster-client-smilga/build',
+    ),
+  ),
+);
 app.use(express.json());
 app.use(helmet());
 app.use(xss());
@@ -25,6 +35,17 @@ app.use(xss());
 // routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/jobs', authenticateUser, jobsRouter);
+
+// serve index.html for any route that's not a part of API
+app.get('*', (req, res) => {
+  res.sendFile(
+    path.resolve(
+      __dirname,
+      '../../node-express-mongo-jobster-client-smilga/build',
+      'index.html',
+    ),
+  );
+});
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
