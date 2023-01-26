@@ -40,6 +40,14 @@ const UserSchema = new mongoose.Schema({
 });
 
 UserSchema.pre('save', async function () {
+  // we can log modified fields of the document if we need to
+  // console.log(this.modifiedPaths());
+
+  // because we don't want to rehash password on every document save,
+  // we want to check first if we are changing the password and ONLY
+  // if it is true we hash the updated password. So that after this change
+  // we are able to log in.
+  if (!this.isModified('password')) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });

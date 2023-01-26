@@ -55,7 +55,7 @@ const updateUser = async (req, res) => {
     throw new BadRequestError('Please provide email, lastname, location, name');
   }
 
-  // here we update user in a different manner:
+  // Here we update user in a different manner to show the PASSWORD GOTCHA.
   // 1) we find the user by its ID
   const user = await User.findOne({ _id: userId });
   // 2) change fields of the found User document
@@ -81,6 +81,14 @@ const updateUser = async (req, res) => {
       token,
     },
   });
+  // AND WE CAN NO LONGER LOGIN! Why? Because if we take a closer look at this code:
+  // UserSchema.pre('save', async function () {
+  //   const salt = await bcrypt.genSalt(10);
+  //   this.password = await bcrypt.hash(this.password, salt);
+  // });
+  // then we can see that this is a PRE-SAVE hook that will be triggered everytime
+  // we call "user.save". As a result ALREADY HASHED PASSWORD WILL BE HASHED AGAIN,
+  // and password that we input on the client has no chance of matching this one.
 };
 
 module.exports = {
