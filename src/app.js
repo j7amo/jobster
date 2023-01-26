@@ -21,14 +21,7 @@ const errorHandlerMiddleware = require('./middleware/error-handler');
 
 app.set('trust proxy', 1);
 // serve the frontend
-app.use(
-  express.static(
-    path.resolve(
-      __dirname,
-      '../../node-express-mongo-jobster-client-smilga/build',
-    ),
-  ),
-);
+app.use(express.static(path.resolve(__dirname, '../client/build')));
 app.use(express.json());
 app.use(helmet());
 app.use(xss());
@@ -39,13 +32,7 @@ app.use('/api/v1/jobs', authenticateUser, jobsRouter);
 
 // serve index.html for any route that's not a part of API
 app.get('*', (req, res) => {
-  res.sendFile(
-    path.resolve(
-      __dirname,
-      '../../node-express-mongo-jobster-client-smilga/build',
-      'index.html',
-    ),
-  );
+  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 });
 
 app.use(notFoundMiddleware);
